@@ -6,9 +6,9 @@ const http = require('http')
 const program = new Command();
 
 program
-  .option('-h, --host <host>', 'Server host')
-  .option('-p, --port <port>', 'Server port')
-  .option('-c, --cache <path>', 'Path to cache');
+  .requiredOption('-h, --host <host>', 'Server host')
+  .requiredOption('-p, --port <port>', 'Server port')
+  .requiredOption('-c, --cache <path>', 'Path to cache');
 
 program.parse(process.argv);
 
@@ -19,11 +19,15 @@ if (!options.host || !options.port || !options.cache){
     process.exit(1);
 }
 
+const {host, port, cache} = options;
+
 const server = http.createServer((req, res) => {
    res.statusCode = 200;
+   res.setHeader('Content-Type', 'text/plain');
+   res.end('Server is running\n');
 }
 );
 
 server.listen(port, host, () => {
-    console.log(`Server running on http://${host},${port}`);
+    console.log(`Server running on http://${host}:${port}`);
 });
