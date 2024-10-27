@@ -37,10 +37,26 @@ const server = http.createServer(async (req, res) => {
   const imagePath = `${cache}/${statusCode}.jpg`;
 
  if (req.method === 'get') {
+  try {
   const image = await fs.readFile(imagePath);
   res.statusCode = 200;
   res.setHeader('Content-Type', 'image/jpeg');
   res.end(image);
+} catch (error) {
+  console.error ('Image not found', error);
+  try {
+    const response = await superagent.get(`https://http.cat/${statusCode}`);
+    await fs.writeFile(imagePath, response.body);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.end(response.body);
+  } catch (error1) {
+    console.error('Error (can\'t get image from cats:', error1);
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Image not found');
+  }
+} 
  } else if (req.method === 'put') {
   let body = [];
   req.on('data', chunk => body.push (chunk));
