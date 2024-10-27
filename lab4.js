@@ -49,7 +49,7 @@ const server = http.createServer(async (req, res) => {
       try { 
         await fs.writeFile(imagePath, image2);
         res.statusCode = 201;
-        res.setHeader('Content-Type','rext/plain');
+        res.setHeader('Content-Type','text/plain');
         res.end('Image saved successfully')
       } catch (error) {
         console.error('Error writing file:', error);
@@ -58,9 +58,25 @@ const server = http.createServer(async (req, res) => {
         res.end('Error saving image');
       }
   }); 
-
+} else if (req.metod === 'delete') {
+  try {
+    await fs.unlink(imagePath);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Image saved successfully');
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Image not found')
+  }
+ } else {
+  res.statusCode = 405;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Method not allowed')
  }
+});
 
 server.listen(port, host, () => {
     console.log(`Server running on http://${host}:${port}`);
-)};
+});
